@@ -50,7 +50,7 @@ function Get-OSInfo {
                     try {
                         $continue = $True
                         $os = get-wmiobject -ErrorVariable myError -erroraction 'stop' -computername $computer -class Win32_OperatingSystem |
-                        Select Caption, BuildNumber, OSArchitecture,ServicePackMajorVersion
+                        Select Caption, BuildNumber, OSArchitecture,ServicePackMajorVersion,lastbootuptime
                         } catch {
                             $continue = $False
                             write-host "ERROR connecting to $computer" -ForegroundColor Red
@@ -62,6 +62,7 @@ function Get-OSInfo {
                         $processor = Get-WmiObject -ComputerName $computer -class Win32_Processor | 
                             select AddressWidth -first 1
                         $properties = @{'ComputerName'=$computer;
+                                        'lastbootuptime'= [Management.ManagementDateTimeConverter]::ToDateTime($os.lastbootuptime);
                                         'OSVersion'=$os.Caption;
                                         'OSBuild'=$os.BuildNumber;
                                         'OSArchitecture'=$os.OSArchitecture -replace '-bit', '';
